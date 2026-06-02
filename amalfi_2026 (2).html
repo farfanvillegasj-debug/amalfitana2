@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Amalfi 2026">
+<meta name="theme-color" content="#ffffff">
+<title>Amalfi 2026 · Ruta 2A</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #ffffff;
+  --bg2: #f7f6f4;
+  --bg3: #f0ede8;
+  --ink: #1a1a1a;
+  --ink2: #555550;
+  --ink3: #999990;
+  --accent: #2a4a6b;
+  --accent2: #3d6b94;
+  --green: #2d5c4a;
+  --green2: #3d7a63;
+  --amber: #8b5e1a;
+  --amber2: #b87d28;
+  --red: #8b2a1a;
+  --border: #e8e5e0;
+  --border2: #d4d0c8;
+  --nav-h: 64px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--ink); font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+
+/* ── SCREENS ── */
+.screen { display: none; min-height: 100vh; padding-bottom: calc(var(--nav-h) + 16px); }
+.screen.active { display: block; }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; height: var(--nav-h);
+  background: var(--bg); border-top: 1px solid var(--border);
+  display: grid; grid-template-columns: repeat(4,1fr);
+  z-index: 200;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.nav-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; background: none; border: none; cursor: pointer;
+  font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 400;
+  color: var(--ink3); transition: color 0.2s;
+}
+.nav-btn.active { color: var(--accent); }
+.nav-icon { font-size: 20px; line-height: 1; }
+
+/* ── HEADER ── */
+.main-header { padding: 48px 24px 32px; border-bottom: 1px solid var(--border); }
+.eyebrow { font-size: 10px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; animation: up 0.5s ease 0.05s both; }
+.h-title { font-family: 'Playfair Display', serif; font-size: clamp(36px,8vw,56px); font-weight: 400; line-height: 1.08; margin-bottom: 8px; animation: up 0.5s ease 0.12s both; }
+.h-title em { font-style: italic; color: var(--accent); }
+.h-sub { font-size: 13px; font-weight: 300; color: var(--ink2); margin-bottom: 28px; animation: up 0.5s ease 0.18s both; }
+.stats-row { display: grid; grid-template-columns: repeat(3,1fr); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; animation: up 0.5s ease 0.24s both; }
+.stat { padding: 14px 10px; text-align: center; border-right: 1px solid var(--border); background: var(--bg2); }
+.stat:last-child { border-right: none; }
+.stat-val { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 400; color: var(--accent); line-height: 1; }
+.stat-lab { font-size: 9px; font-weight: 400; color: var(--ink3); margin-top: 4px; }
+
+/* ── CONTENT WRAPPER ── */
+.content { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+.sec-label { font-size: 9px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink3); margin: 32px 0 14px; }
+
+/* ── MAP ── */
+.map-wrap { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: #eef4f8; }
+
+/* ── DAY BLOCKS ── */
+.day-block { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 14px; }
+.day-head { padding: 18px 20px 14px; border-bottom: 1px solid var(--border); background: var(--bg2); }
+.day-date { font-size: 9px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 4px; }
+.day-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 400; line-height: 1.2; margin-bottom: 4px; }
+.day-tagline { font-size: 11px; font-weight: 300; color: var(--ink2); }
+.flow-bar { padding: 10px 20px; border-bottom: 1px solid var(--border); background: var(--bg3); display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.flow-pill { font-size: 10px; padding: 2px 9px; border-radius: 20px; white-space: nowrap; border: 1px solid; }
+.flow-arr { font-size: 9px; color: var(--ink3); }
+.day-body { display: grid; grid-template-columns: 1fr 1fr; }
+@media(max-width:520px){ .day-body{grid-template-columns:1fr} .col-l{border-right:none!important;border-bottom:1px solid var(--border)} }
+.col-l { padding: 16px 20px; border-right: 1px solid var(--border); }
+.col-r { padding: 16px 20px; }
+.col-lbl { font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink3); margin-bottom: 12px; }
+.ev { display: flex; gap: 9px; margin-bottom: 9px; align-items: flex-start; }
+.ev-t { font-size: 9px; color: var(--ink3); min-width: 34px; padding-top: 2px; flex-shrink: 0; }
+.ev-dot { width: 4px; height: 4px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+.ev-d { font-size: 11px; font-weight: 300; color: var(--ink); line-height: 1.55; }
+.ev-d.key { font-weight: 400; }
+.li { display: flex; gap: 9px; margin-bottom: 11px; align-items: flex-start; }
+.li-ico { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+.li-title { font-size: 11px; font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+.li-text { font-size: 10px; font-weight: 300; color: var(--ink2); line-height: 1.6; }
+
+/* ── NOTES / WARN ── */
+.notes { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 14px; }
+.notes-head { padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--bg2); }
+.notes-head-text { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 400; }
+.note { display: flex; gap: 13px; padding: 13px 20px; border-bottom: 1px solid var(--border); align-items: flex-start; }
+.note:last-child { border-bottom: none; }
+.note-ico { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+.note-title { font-size: 11px; font-weight: 500; margin-bottom: 3px; }
+.note-text { font-size: 10px; font-weight: 300; color: var(--ink2); line-height: 1.6; }
+.warn { border: 1px solid #e8c89a; border-left: 3px solid var(--amber2); border-radius: 10px; background: #fdf8f0; padding: 13px 16px; display: flex; gap: 11px; margin-bottom: 14px; align-items: flex-start; }
+.warn-title { font-size: 11px; font-weight: 500; color: var(--amber); margin-bottom: 3px; }
+.warn-text { font-size: 10px; font-weight: 300; color: #7a5214; line-height: 1.6; }
+.closer { border-top: 1px solid var(--border); padding: 28px 0 16px; text-align: center; }
+.closer-q { font-family: 'Playfair Display', serif; font-size: clamp(15px,3.5vw,18px); font-style: italic; color: var(--ink); line-height: 1.65; margin-bottom: 14px; max-width: 560px; margin-left: auto; margin-right: auto; }
+.closer-sub { font-size: 11px; color: var(--accent); letter-spacing: 0.06em; }
+
+/* ── PARADAS ── */
+.paradas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 20px 20px 0; max-width: 720px; margin: 0 auto; }
+@media(max-width:400px){ .paradas-grid{grid-template-columns:1fr} }
+.parada-card {
+  border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+  cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+  background: var(--bg);
+}
+.parada-card:active { transform: scale(0.97); }
+.parada-thumb {
+  height: 110px; position: relative; overflow: hidden;
+  background: var(--bg3);
+}
+.parada-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.parada-thumb-label {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+  padding: 20px 12px 8px;
+  font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 400;
+  color: white;
+}
+.parada-meta { padding: 10px 12px 12px; }
+.parada-tag { font-size: 9px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink3); margin-bottom: 2px; }
+.parada-desc { font-size: 11px; font-weight: 300; color: var(--ink2); line-height: 1.4; }
+.parada-photos-count { font-size: 10px; color: var(--accent); margin-top: 6px; font-weight: 400; }
+
+/* ── PARADA DETAIL ── */
+.detail-screen { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 300; overflow-y: auto; padding-bottom: 40px; }
+.detail-screen.open { display: block; }
+.detail-hero { height: 220px; position: relative; overflow: hidden; background: var(--bg3); }
+.detail-hero img { width: 100%; height: 100%; object-fit: cover; }
+.detail-hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 50%); }
+.detail-back { position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
+.detail-title { position: absolute; bottom: 16px; left: 20px; right: 20px; font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 400; color: white; line-height: 1.15; }
+.detail-body { padding: 20px 20px 0; max-width: 720px; margin: 0 auto; }
+.detail-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+.d-pill { font-size: 10px; padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border2); background: var(--bg2); color: var(--ink2); }
+.detail-info { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+@media(max-width:400px){ .detail-info{grid-template-columns:1fr} }
+.info-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.info-card-label { font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink3); margin-bottom: 4px; }
+.info-card-val { font-size: 12px; font-weight: 400; color: var(--ink); line-height: 1.5; }
+.pro-tip { background: #f0f7f4; border: 1px solid #c0ddd4; border-left: 3px solid var(--green); border-radius: 10px; padding: 13px 16px; margin-bottom: 20px; display: flex; gap: 10px; }
+.pro-tip-text { font-size: 11px; font-weight: 300; color: var(--green); line-height: 1.6; }
+
+/* ── PHOTO GALLERY ── */
+.gallery-section { margin-bottom: 20px; }
+.gallery-label { font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink3); margin-bottom: 12px; }
+.photo-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.photo-slot {
+  aspect-ratio: 1; border-radius: 10px; overflow: hidden;
+  border: 1.5px dashed var(--border2); background: var(--bg2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative; transition: border-color 0.2s;
+}
+.photo-slot:active { border-color: var(--accent); }
+.photo-slot img { width: 100%; height: 100%; object-fit: cover; }
+.photo-slot.empty { flex-direction: column; gap: 4px; }
+.photo-plus { font-size: 22px; color: var(--border2); }
+.photo-slot-label { font-size: 9px; color: var(--ink3); }
+.photo-delete {
+  position: absolute; top: 4px; right: 4px;
+  background: rgba(0,0,0,0.5); border: none; border-radius: 50%;
+  width: 22px; height: 22px; color: white; font-size: 12px;
+  cursor: pointer; display: none; align-items: center; justify-content: center;
+}
+.photo-slot:not(.empty) .photo-delete { display: flex; }
+.photo-input { display: none; }
+
+/* ── CHECKLIST ── */
+.checklist-wrap { padding: 20px 20px 0; max-width: 720px; margin: 0 auto; }
+.progress-bar-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; }
+.progress-label { font-size: 11px; font-weight: 400; color: var(--ink2); margin-bottom: 10px; display: flex; justify-content: space-between; }
+.progress-label span { font-weight: 500; color: var(--accent); }
+.progress-bar { height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.4s ease; }
+.cl-group { margin-bottom: 16px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.cl-group-head { padding: 12px 16px; background: var(--bg2); border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 500; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+.cl-group-ico { font-size: 14px; }
+.cl-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
+.cl-item:last-child { border-bottom: none; }
+.cl-item:active { background: var(--bg2); }
+.cl-check { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--border2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.cl-item.done .cl-check { background: var(--accent); border-color: var(--accent); }
+.cl-check-inner { width: 6px; height: 6px; border-right: 2px solid white; border-bottom: 2px solid white; transform: rotate(45deg) translate(-1px,-1px); opacity: 0; transition: opacity 0.2s; }
+.cl-item.done .cl-check-inner { opacity: 1; }
+.cl-text { font-size: 12px; font-weight: 300; color: var(--ink); transition: color 0.2s; line-height: 1.4; }
+.cl-item.done .cl-text { color: var(--ink3); text-decoration: line-through; }
+
+/* ── PRESUPUESTO ── */
+.budget-wrap { padding: 20px 20px 0; max-width: 720px; margin: 0 auto; }
+.budget-total { background: var(--accent); border-radius: 14px; padding: 20px 22px; margin-bottom: 20px; color: white; display: flex; justify-content: space-between; align-items: center; }
+.budget-total-label { font-size: 11px; font-weight: 300; opacity: 0.8; margin-bottom: 4px; }
+.budget-total-val { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 400; }
+.budget-per-person { font-size: 11px; opacity: 0.75; margin-top: 2px; }
+.budget-est { font-size: 11px; opacity: 0.7; text-align: right; }
+.budget-est-val { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 400; opacity: 0.9; }
+
+.budget-section { margin-bottom: 16px; }
+.budget-section-head { font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink3); margin-bottom: 10px; }
+.budget-items { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg); }
+.budget-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.budget-item:last-child { border-bottom: none; }
+.budget-item-label { flex: 1; font-size: 12px; font-weight: 300; color: var(--ink); }
+.budget-item-est { font-size: 10px; color: var(--ink3); margin-right: 8px; white-space: nowrap; }
+.budget-input {
+  width: 72px; text-align: right; border: 1px solid var(--border2); border-radius: 6px;
+  padding: 5px 8px; font-size: 12px; font-family: 'Inter', sans-serif;
+  color: var(--ink); background: var(--bg2); outline: none;
+}
+.budget-input:focus { border-color: var(--accent); }
+.budget-add-btn {
+  width: 100%; padding: 12px; background: none; border: 1.5px dashed var(--border2);
+  border-radius: 10px; font-size: 12px; color: var(--ink3); cursor: pointer;
+  font-family: 'Inter', sans-serif; margin-top: 8px; transition: border-color 0.2s, color 0.2s;
+}
+.budget-add-btn:active { border-color: var(--accent); color: var(--accent); }
+
+/* ── TAGS ── */
+.tags { display: flex; flex-wrap: wrap; gap: 6px; padding: 16px 0 20px; }
+.tag { font-size: 10px; padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border2); color: var(--ink2); background: var(--bg2); }
+
+/* ── ANIM ── */
+@keyframes up { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     SCREEN: RUTA
+══════════════════════════════════════ -->
+<div class="screen active" id="screen-ruta">
+
+  <div class="main-header">
+    <div class="eyebrow">Ruta 2A · Elegida · 26–28 Julio 2026</div>
+    <div class="h-title">Costa <em>Amalfitana</em></div>
+    <div class="h-sub">Dos tíos · mochilas · tres días diseñados para que fluyan solos</div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-val">4</div><div class="stat-lab">ferrys</div></div>
+      <div class="stat"><div class="stat-val">2</div><div class="stat-lab">hoteles</div></div>
+      <div class="stat"><div class="stat-val">0</div><div class="stat-lab">retrocesos</div></div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="sec-label">El flujo completo</div>
+    <div class="map-wrap">
+    <svg viewBox="0 0 680 300" width="100%" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="a1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#2a4a6b"/></marker>
+        <marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#2d5c4a"/></marker>
+        <marker id="a3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#8b5e1a"/></marker>
+      </defs>
+      <rect width="680" height="300" fill="#ddeef6"/>
+      <path d="M0,0 L680,0 L680,145 Q600,123 520,133 Q460,138 420,128 Q370,118 330,123 Q290,128 260,138 Q220,148 180,153 Q140,155 100,151 Q60,147 0,153 Z" fill="#e8e2d8"/>
+      <path d="M186,153 Q216,158 246,168 Q266,178 276,193 Q271,213 256,223 Q236,233 216,228 Q196,221 186,208 Q178,193 181,178 Z" fill="#ddd6c8"/>
+      <path d="M276,193 Q306,178 336,168 Q376,158 416,155 Q456,153 496,158 Q536,163 566,173 L566,203 Q536,193 496,188 Q456,183 416,185 Q376,188 336,198 Q306,205 276,218 Z" fill="#ddd6c8"/>
+      <ellipse cx="186" cy="265" rx="25" ry="10" fill="#cfc8b8" stroke="#bbb0a0" stroke-width="0.8"/>
+      <text x="186" y="269" font-size="8" fill="#6a6050" text-anchor="middle" font-family="'Inter',sans-serif">Capri</text>
+      <text x="105" y="272" font-size="8" fill="rgba(42,74,107,0.4)" font-family="'Inter',sans-serif">Golfo di Napoli</text>
+      <text x="390" y="283" font-size="8" fill="rgba(42,74,107,0.4)" font-family="'Inter',sans-serif">Golfo di Salerno</text>
+      <line x1="84" y1="143" x2="472" y2="171" stroke="#2a4a6b" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#a1)" opacity="0.7"/>
+      <rect x="230" y="107" width="94" height="13" rx="4" fill="rgba(255,255,255,0.88)"/>
+      <text x="277" y="117" font-size="8.5" fill="#2a4a6b" text-anchor="middle" font-family="'Inter',sans-serif" font-weight="500">Dom · tren → Salerno</text>
+      <path d="M474,176 Q442,185 384,190" stroke="#2a4a6b" stroke-width="2" fill="none" marker-end="url(#a1)" opacity="0.85"/>
+      <rect x="400" y="188" width="58" height="13" rx="4" fill="rgba(255,255,255,0.88)"/>
+      <text x="429" y="198" font-size="8.5" fill="#2a4a6b" text-anchor="middle" font-family="'Inter',sans-serif" font-weight="500">Dom · ferry ⛴</text>
+      <path d="M368,188 Q348,179 332,187 Q314,179 301,190" stroke="#2d5c4a" stroke-width="1.5" fill="none" stroke-dasharray="3,2" marker-end="url(#a2)" opacity="0.9"/>
+      <rect x="308" y="167" width="54" height="13" rx="4" fill="rgba(255,255,255,0.88)"/>
+      <text x="335" y="177" font-size="8.5" fill="#2d5c4a" text-anchor="middle" font-family="'Inter',sans-serif" font-weight="500">Lun · vespa</text>
+      <path d="M367,195 Q308,211 226,195" stroke="#2d5c4a" stroke-width="2" fill="none" marker-end="url(#a2)" opacity="0.85"/>
+      <rect x="258" y="209" width="82" height="13" rx="4" fill="rgba(255,255,255,0.88)"/>
+      <text x="299" y="219" font-size="8.5" fill="#2d5c4a" text-anchor="middle" font-family="'Inter',sans-serif" font-weight="500">Lun · ferry ⛴ Positano</text>
+      <path d="M216,197 Q202,237 194,258" stroke="#8b5e1a" stroke-width="2" fill="none" marker-end="url(#a3)" opacity="0.85"/>
+      <rect x="158" y="228" width="44" height="13" rx="4" fill="rgba(255,255,255,0.88)"/>
+      <text x="180" y="238" font-size="8.5" fill="#8b5e1a" text-anchor="middle" font-family="'Inter',sans-serif" font-weight="500">Mar · ferry</text>
+      <path d="M171,263 Q116,236 82,150" stroke="#8b5e1a" stroke-width="2" fill="none" marker-end="url(#a3)" opacity="0.85"/>
+      <rect x="80" y="210" width="64" height="13" rx="4" fill="rgba(255,255,255,0.88)"/>
+      <text x="112" y="220" font-size="8.5" fill="#8b5e1a" text-anchor="middle" font-family="'Inter',sans-serif" font-weight="500">Mar · directo ⛴</text>
+      <circle cx="84" cy="140" r="9" fill="#2a4a6b" stroke="white" stroke-width="2"/>
+      <text x="84" y="143" font-size="7" fill="white" text-anchor="middle" font-weight="700">✈</text>
+      <text x="84" y="127" font-size="9" fill="#2a4a6b" text-anchor="middle" font-family="'Inter',sans-serif" font-weight="500">Nápoles</text>
+      <circle cx="476" cy="175" r="5" fill="#2a4a6b" stroke="white" stroke-width="1.5" opacity="0.8"/>
+      <text x="506" y="171" font-size="8.5" fill="#2a4a6b" font-family="'Inter',sans-serif" opacity="0.8">Salerno</text>
+      <circle cx="386" cy="169" r="3.5" fill="#2a4a6b" stroke="white" stroke-width="1.2" opacity="0.6"/>
+      <text x="386" y="160" font-size="8" fill="#2a4a6b" text-anchor="middle" font-family="'Inter',sans-serif" opacity="0.7">Ravello</text>
+      <circle cx="333" cy="187" r="3.5" fill="#2d5c4a" stroke="white" stroke-width="1.2"/>
+      <text x="333" y="200" font-size="8" fill="#2d5c4a" text-anchor="middle" font-family="'Inter',sans-serif">Fiordo</text>
+      <circle cx="299" cy="193" r="3.5" fill="#2d5c4a" stroke="white" stroke-width="1.2"/>
+      <text x="299" y="207" font-size="8" fill="#2d5c4a" text-anchor="middle" font-family="'Inter',sans-serif">Positano</text>
+      <circle cx="374" cy="190" r="10" fill="#2a4a6b" stroke="white" stroke-width="2"/>
+      <text x="374" y="193" font-size="7" fill="white" text-anchor="middle">🌙</text>
+      <text x="374" y="206" font-size="9" fill="#2a4a6b" text-anchor="middle" font-family="'Inter',sans-serif" font-weight="500">Amalfi</text>
+      <circle cx="220" cy="193" r="10" fill="#2d5c4a" stroke="white" stroke-width="2"/>
+      <text x="220" y="196" font-size="7" fill="white" text-anchor="middle">🌙</text>
+      <text x="220" y="182" font-size="9" fill="#2d5c4a" text-anchor="middle" font-family="'Inter',sans-serif" font-weight="500">Sorrento</text>
+      <circle cx="186" cy="265" r="7" fill="#8b5e1a" stroke="white" stroke-width="2"/>
+      <text x="186" y="268" font-size="6" fill="white" text-anchor="middle">🐚</text>
+      <circle cx="242" cy="124" r="8" fill="#2a4a6b"/><text x="242" y="127" font-size="9" fill="white" text-anchor="middle" font-family="'Inter',sans-serif" font-weight="500">1</text>
+      <circle cx="428" cy="188" r="8" fill="#2a4a6b"/><text x="428" y="191" font-size="9" fill="white" text-anchor="middle" font-family="'Inter',sans-serif" font-weight="500">2</text>
+      <circle cx="310" cy="224" r="8" fill="#2d5c4a"/><text x="310" y="227" font-size="9" fill="white" text-anchor="middle" font-family="'Inter',sans-serif" font-weight="500">3</text>
+      <circle cx="184" cy="242" r="8" fill="#8b5e1a"/><text x="184" y="245" font-size="9" fill="white" text-anchor="middle" font-family="'Inter',sans-serif" font-weight="500">4</text>
+      <circle cx="102" cy="210" r="8" fill="#8b5e1a"/><text x="102" y="213" font-size="9" fill="white" text-anchor="middle" font-family="'Inter',sans-serif" font-weight="500">5</text>
+      <line x1="14" y1="290" x2="30" y2="290" stroke="#2a4a6b" stroke-width="1.5" stroke-dasharray="5,3"/><text x="34" y="294" font-size="7.5" fill="#888" font-family="'Inter',sans-serif">Tren</text>
+      <line x1="62" y1="290" x2="78" y2="290" stroke="#2a4a6b" stroke-width="2"/><text x="82" y="294" font-size="7.5" fill="#888" font-family="'Inter',sans-serif">Dom ferry</text>
+      <line x1="136" y1="290" x2="152" y2="290" stroke="#2d5c4a" stroke-width="2"/><text x="156" y="294" font-size="7.5" fill="#888" font-family="'Inter',sans-serif">Lun ferry</text>
+      <line x1="202" y1="290" x2="218" y2="290" stroke="#2d5c4a" stroke-width="1.5" stroke-dasharray="3,2"/><text x="222" y="294" font-size="7.5" fill="#888" font-family="'Inter',sans-serif">Vespa</text>
+      <line x1="256" y1="290" x2="272" y2="290" stroke="#8b5e1a" stroke-width="2"/><text x="276" y="294" font-size="7.5" fill="#888" font-family="'Inter',sans-serif">Mar ferry</text>
+      <circle cx="320" cy="290" r="4" fill="#2a4a6b"/><text x="328" y="294" font-size="7.5" fill="#888" font-family="'Inter',sans-serif">Noche 1</text>
+      <circle cx="376" cy="290" r="4" fill="#2d5c4a"/><text x="384" y="294" font-size="7.5" fill="#888" font-family="'Inter',sans-serif">Noche 2</text>
+    </svg>
+    </div>
+
+    <div class="sec-label" style="margin-top:32px">La lógica detrás de cada movimiento</div>
+
+    <!-- DOM 26 -->
+    <div class="day-block">
+      <div class="day-head">
+        <div class="day-date" style="color:var(--accent)">Domingo 26 · Noche en Amalfi</div>
+        <div class="day-name">La entrada limpia y la mística nocturna</div>
+        <div class="day-tagline">Salerno → Amalfi → Ravello al atardecer → Piazza del Duomo de noche</div>
+      </div>
+      <div class="flow-bar">
+        <span class="flow-pill" style="border-color:#c0cedd;color:var(--accent);background:#eef3f8">Nápoles</span><span class="flow-arr">→</span>
+        <span class="flow-pill" style="border-color:#b0c4d8;color:var(--accent);background:#e4edf5">Tren Salerno 35 min</span><span class="flow-arr">→</span>
+        <span class="flow-pill" style="border-color:#b0c4d8;color:var(--accent);background:#e4edf5">Ferry Amalfi ⛴</span><span class="flow-arr">→</span>
+        <span class="flow-pill" style="border-color:#9ab8d0;color:var(--accent);background:#d8e8f2">Ravello ✨</span><span class="flow-arr">→</span>
+        <span class="flow-pill" style="border-color:#c0cedd;color:var(--accent);background:#eef3f8">Cena de noche</span>
+      </div>
+      <div class="day-body">
+        <div class="col-l">
+          <div class="col-lbl">Horario</div>
+          <div class="ev"><span class="ev-t">14:05</span><div class="ev-dot" style="background:var(--accent)"></div><span class="ev-d">Aterrizas en Nápoles. Pizza rápida.</span></div>
+          <div class="ev"><span class="ev-t">~16:00</span><div class="ev-dot" style="background:var(--accent)"></div><span class="ev-d">Tren Nápoles → Salerno. 35 min, ~3€.</span></div>
+          <div class="ev"><span class="ev-t">~17:15</span><div class="ev-dot" style="background:var(--accent)"></div><span class="ev-d">Ferry Salerno → Amalfi. 35 min. Primera vista de los acantilados desde el agua.</span></div>
+          <div class="ev"><span class="ev-t">~18:30</span><div class="ev-dot" style="background:var(--accent2)"></div><span class="ev-d key">Taxi a Ravello (20 min). Atardecer en Villa Cimbrone. El momento del viaje.</span></div>
+          <div class="ev"><span class="ev-t">~21:00</span><div class="ev-dot" style="background:var(--accent2)"></div><span class="ev-d key">Cena en la Piazza del Duomo iluminada. Los turistas de día ya se han ido.</span></div>
+          <div class="ev"><span class="ev-t">noche</span><div class="ev-dot" style="background:var(--accent)"></div><span class="ev-d">Duermes en Amalfi.</span></div>
+        </div>
+        <div class="col-r">
+          <div class="col-lbl">Por qué lo hacemos así</div>
+          <div class="li"><div class="li-ico">🚆</div><div><div class="li-title">Entrada por Salerno, no por Sorrento</div><div class="li-text">Sorrento y Amalfi están en la misma dirección desde Nápoles. Si empezaras en Sorrento añadirías un ferry extra y pagarías una noche que solo usarías de cama.</div></div></div>
+          <div class="li"><div class="li-ico">🌊</div><div><div class="li-title">El primer impacto es por mar</div><div class="li-text">Llegas en ferry viendo los acantilados desde el agua. Pocos viajeros lo hacen así.</div></div></div>
+          <div class="li"><div class="li-ico">🌅</div><div><div class="li-title">Ravello al atardecer</div><div class="li-text">Ravello de día está lleno de grupos. Al atardecer es tuyo. Y la Piazza de noche tiene una mística que de día no existe.</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LUN 27 -->
+    <div class="day-block">
+      <div class="day-head">
+        <div class="day-date" style="color:var(--green)">Lunes 27 · Noche en Sorrento</div>
+        <div class="day-name">El día de la vespa · libertad sin cargas</div>
+        <div class="day-tagline">Vespa por la costa → Fiordo → Positano → Ferry de tarde a Sorrento</div>
+      </div>
+      <div class="flow-bar">
+        <span class="flow-pill" style="border-color:#b0d0c4;color:var(--green);background:#eaf4ef">Check-out Amalfi</span><span class="flow-arr">→</span>
+        <span class="flow-pill" style="border-color:#90c0b0;color:var(--green);background:#daeee7">Vespa 🛵</span><span class="flow-arr">→</span>
+        <span class="flow-pill" style="border-color:#90c0b0;color:var(--green);background:#daeee7">Fiordo + Positano</span><span class="flow-arr">→</span>
+        <span class="flow-pill" style="border-color:#90c0b0;color:var(--green);background:#daeee7">Ferry Sorrento ⛴</span>
+      </div>
+      <div class="day-body">
+        <div class="col-l">
+          <div class="col-lbl">Horario</div>
+          <div class="ev"><span class="ev-t">08:30</span><div class="ev-dot" style="background:var(--green)"></div><span class="ev-d">Alquilas vespa en Amalfi. Dejas mochila en recepción.</span></div>
+          <div class="ev"><span class="ev-t">09:00</span><div class="ev-dot" style="background:var(--green2)"></div><span class="ev-d key">Atrani: el pueblo más pequeño de Italia. 5 min desde Amalfi.</span></div>
+          <div class="ev"><span class="ev-t">10:00</span><div class="ev-dot" style="background:var(--green2)"></div><span class="ev-d key">Fiordo di Furore. Bajas a la cala y te metes al agua. Mínimo 1h 30m.</span></div>
+          <div class="ev"><span class="ev-t">12:30</span><div class="ev-dot" style="background:var(--green2)"></div><span class="ev-d key">Positano. Mirador para la foto. Panini en la arena de Marina Grande.</span></div>
+          <div class="ev"><span class="ev-t">14:30</span><div class="ev-dot" style="background:var(--green)"></div><span class="ev-d">Regreso Amalfi. Devolvéis moto. Recogéis mochilas.</span></div>
+          <div class="ev"><span class="ev-t">~17:30</span><div class="ev-dot" style="background:var(--red)"></div><span class="ev-d key">Ferry Amalfi → Sorrento. Veis Positano desde el mar. Comprad billete el domingo.</span></div>
+          <div class="ev"><span class="ev-t">noche</span><div class="ev-dot" style="background:var(--green)"></div><span class="ev-d">Sorrento. Cena gnocchi alla sorrentina en Marina Grande.</span></div>
+        </div>
+        <div class="col-r">
+          <div class="col-lbl">Por qué lo hacemos así</div>
+          <div class="li"><div class="li-ico">🎒</div><div><div class="li-title">Ruta ligeros de equipaje</div><div class="li-text">Circuito cerrado desde Amalfi: salís sin mochilas, volvéis a recogerlas. Conducir con equipaje en julio es incómodo y peligroso.</div></div></div>
+          <div class="li"><div class="li-ico">🛵</div><div><div class="li-title">Vespa frente a autobús</div><div class="li-text">En julio la SS163 tiene retenciones constantes. En vespa os saltáis las colas y aparcáis donde queráis.</div></div></div>
+          <div class="li"><div class="li-ico">🛡️</div><div><div class="li-title">Sorrento como escudo</div><div class="li-text">Dormir en Sorrento quita toda la presión. Si os retrasáis no pasa nada. Y mañana estáis a 20 min de Capri.</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAR 28 -->
+    <div class="day-block">
+      <div class="day-head">
+        <div class="day-date" style="color:var(--amber)">Martes 28 · Regreso a Nápoles</div>
+        <div class="day-name">El broche de oro en Capri</div>
+        <div class="day-tagline">Ferry 20 min → Gruta Azul → tarde libre → Ferry directo a Nápoles</div>
+      </div>
+      <div class="flow-bar">
+        <span class="flow-pill" style="border-color:#d4b890;color:var(--amber);background:#faf3e8">Sorrento→Capri 20 min ⚡</span><span class="flow-arr">→</span>
+        <span class="flow-pill" style="border-color:#c4a878;color:var(--amber);background:#f5ead8">Gruta Azul</span><span class="flow-arr">→</span>
+        <span class="flow-pill" style="border-color:#d4b890;color:var(--amber);background:#faf3e8">Tarde libre</span><span class="flow-arr">→</span>
+        <span class="flow-pill" style="border-color:#c4a878;color:var(--amber);background:#f5ead8">Ferry Nápoles ✨</span>
+      </div>
+      <div class="day-body">
+        <div class="col-l">
+          <div class="col-lbl">Horario</div>
+          <div class="ev"><span class="ev-t">08:30</span><div class="ev-dot" style="background:var(--amber)"></div><span class="ev-d">Ferry Sorrento → Capri. Solo 20 min.</span></div>
+          <div class="ev"><span class="ev-t">09:00</span><div class="ev-dot" style="background:var(--amber2)"></div><span class="ev-d key">Gruta Azul. Reservad el bote nada más llegar. Mejor luz 11h–14h.</span></div>
+          <div class="ev"><span class="ev-t">10:30</span><div class="ev-dot" style="background:var(--amber)"></div><span class="ev-d">Paseo en barco alrededor de la isla. Snorkel.</span></div>
+          <div class="ev"><span class="ev-t">13:00</span><div class="ev-dot" style="background:var(--amber)"></div><span class="ev-d">Almuerzo en el puerto. Tarde libre en Capri.</span></div>
+          <div class="ev"><span class="ev-t">17:00</span><div class="ev-dot" style="background:var(--amber2)"></div><span class="ev-d key">Ferry Capri → Nápoles directo. 45 min. El Vesubio al fondo.</span></div>
+          <div class="ev"><span class="ev-t">~18:00</span><div class="ev-dot" style="background:var(--amber)"></div><span class="ev-d">Nápoles. Pizza de cierre. Hotel aeropuerto.</span></div>
+        </div>
+        <div class="col-r">
+          <div class="col-lbl">Por qué lo hacemos así</div>
+          <div class="li"><div class="li-ico">⚡</div><div><div class="li-title">Ventaja desde Sorrento</div><div class="li-text">20 minutos vs 1 hora desde Amalfi. Llegáis 2 horas antes que el resto. La Gruta sin colas es el resultado de haber dormido en Sorrento.</div></div></div>
+          <div class="li"><div class="li-ico">🚢</div><div><div class="li-title">El regreso más elegante</div><div class="li-text">El viaje termina llegando a Nápoles por mar desde Capri. 45 minutos con el golfo entero delante.</div></div></div>
+          <div class="li"><div class="li-ico">🌋</div><div><div class="li-title">Capri el tercer día</div><div class="li-text">La Gruta cierra si hay oleaje. Hacerla el martes os da el día entero sin presiones.</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-label" style="margin-top:28px">Notas de supervivencia</div>
+    <div class="notes">
+      <div class="notes-head"><div class="notes-head-text">Consejos pro</div></div>
+      <div class="note"><div class="note-ico">🧳</div><div><div class="note-title">Solo mochilas. Esta es la regla de oro.</div><div class="note-text">Ferrys, escaleras de piedra, cambios de hotel, vespa. Con maletas de ruedas perderías tiempo en cada transición.</div></div></div>
+      <div class="note"><div class="note-ico">🎫</div><div><div class="note-title">Billete ferry del lunes: cómpralo el domingo</div><div class="note-text">En cuanto piséis el puerto de Amalfi el domingo, comprad ya el billete del ferry del lunes hacia Sorrento. En julio ese barco se llena.</div></div></div>
+      <div class="note"><div class="note-ico">🥪</div><div><div class="note-title">El almuerzo en Positano: no caigáis en la trampa</div><div class="note-text">Restaurante formal en la playa = 2 horas y presupuesto absurdo. El plan pro: panini en un alimentari, en la arena de Marina Grande.</div></div></div>
+      <div class="note"><div class="note-ico">🌊</div><div><div class="note-title">Fiordo di Furore: dadle tiempo de verdad</div><div class="note-text">Mínimo 1h 30m. Bajad las escaleras a la cala, meteos al agua. Llevad calzado de agua.</div></div></div>
+      <div class="note"><div class="note-ico">🏨</div><div><div class="note-title">Hotel en Nápoles la noche del martes</div><div class="note-text">Reservad cerca del aeropuerto Capodichino. Llegáis sobre las 18h, cenáis pizza y al día siguiente al vuelo de las 6am sin estrés.</div></div></div>
+    </div>
+
+    <div class="warn">
+      <div style="font-size:17px;flex-shrink:0;margin-top:1px">⚠️</div>
+      <div>
+        <div class="warn-title">El único punto de presión: ferry Amalfi → Sorrento del lunes</div>
+        <div class="warn-text">Comprad el billete el domingo. Tened el horario exacto en el móvil antes de salir en vespa. Es el único momento donde el timing importa de verdad.</div>
+      </div>
+    </div>
+
+    <div class="closer">
+      <div class="closer-q">"Cada noche dormís donde tiene sentido dormir. Cada mañana tenéis lo mejor delante."</div>
+      <div class="closer-sub">Dos tíos · mochilas · tres días · va a ser brutal 🌊</div>
+    </div>
+
+    <div class="tags">
+      <span class="tag">Entrada por Salerno</span><span class="tag">Ravello al atardecer</span>
+      <span class="tag">Amalfi de noche</span><span class="tag">Vespa sin equipaje</span>
+      <span class="tag">Fiordo di Furore</span><span class="tag">Positano desde el mar</span>
+      <span class="tag">Capri a 20 min</span><span class="tag">Gruta Azul sin colas</span>
+      <span class="tag">Capri→Nápoles directo</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN: PARADAS
+══════════════════════════════════════ -->
+<div class="screen" id="screen-paradas">
+  <div style="padding:32px 20px 8px;max-width:720px;margin:0 auto">
+    <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:400;margin-bottom:4px">Paradas</div>
+    <div style="font-size:12px;font-weight:300;color:var(--ink2)">Toca una parada para ver la ficha completa y añadir tus fotos</div>
+  </div>
+  <div class="paradas-grid" id="paradas-grid"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN: CHECKLIST
+══════════════════════════════════════ -->
+<div class="screen" id="screen-checklist">
+  <div class="checklist-wrap">
+    <div style="padding:32px 0 20px">
+      <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:400;margin-bottom:4px">Checklist</div>
+      <div style="font-size:12px;font-weight:300;color:var(--ink2)">Todo lo que hay que tener listo antes de salir</div>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-label">Tareas completadas <span id="progress-text">0 / 0</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+
+    <div id="checklist-groups"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN: PRESUPUESTO
+══════════════════════════════════════ -->
+<div class="screen" id="screen-presupuesto">
+  <div class="budget-wrap">
+    <div style="padding:32px 0 20px">
+      <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:400;margin-bottom:4px">Presupuesto</div>
+      <div style="font-size:12px;font-weight:300;color:var(--ink2)">Estimación previa y gastos reales del viaje</div>
+    </div>
+
+    <div class="budget-total">
+      <div>
+        <div class="budget-total-label">Total gastado</div>
+        <div class="budget-total-val" id="budget-total">0 €</div>
+        <div class="budget-per-person" id="budget-pp">0 € por persona</div>
+      </div>
+      <div style="text-align:right">
+        <div class="budget-est">Estimación</div>
+        <div class="budget-est-val">~680 €</div>
+        <div style="font-size:10px;opacity:0.65;margin-top:2px">para 2 personas</div>
+      </div>
+    </div>
+
+    <div id="budget-sections"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PARADA DETAIL OVERLAY
+══════════════════════════════════════ -->
+<div class="detail-screen" id="detail-screen">
+  <div class="detail-hero" id="detail-hero">
+    <img id="detail-hero-img" src="" alt="">
+    <div class="detail-hero-overlay"></div>
+    <button class="detail-back" onclick="closeDetail()">←</button>
+    <div class="detail-title" id="detail-title"></div>
+  </div>
+  <div class="detail-body">
+    <div class="detail-pills" id="detail-pills"></div>
+    <div class="detail-info" id="detail-info"></div>
+    <div class="pro-tip" id="detail-tip"></div>
+    <div class="gallery-section">
+      <div class="gallery-label">Vuestras fotos · hasta 6 por parada</div>
+      <div class="photo-grid" id="detail-gallery"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     BOTTOM NAV
+══════════════════════════════════════ -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="showScreen('ruta',this)">
+    <span class="nav-icon">🗺</span><span>Ruta</span>
+  </button>
+  <button class="nav-btn" onclick="showScreen('paradas',this)">
+    <span class="nav-icon">📍</span><span>Paradas</span>
+  </button>
+  <button class="nav-btn" onclick="showScreen('checklist',this)">
+    <span class="nav-icon">✅</span><span>Checklist</span>
+  </button>
+  <button class="nav-btn" onclick="showScreen('presupuesto',this)">
+    <span class="nav-icon">💶</span><span>Presupuesto</span>
+  </button>
+</nav>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+const PARADAS = [
+  {
+    id:'amalfi', name:'Amalfi', day:'Dom 26 · Lun 27',
+    img:'https://images.unsplash.com/photo-1533587851505-d119e13fa0d7?w=800&q=80',
+    desc:'Capital de la costa. Piazza del Duomo iluminada de noche.',
+    pills:['Dom noche','Lun base vespa'],
+    info:[
+      {label:'Qué hacer',val:'Piazza del Duomo · Taquilla del puerto · Paseo nocturno'},
+      {label:'Cuánto tiempo',val:'2 noches · Plaza mejor de noche'},
+      {label:'Qué cuesta',val:'Ferry Salerno ~15€/pax · Taxi Ravello ~20€'},
+      {label:'No te pierdas',val:'La catedral iluminada a las 22h cuando se van los turistas de día'}
+    ],
+    tip:'En cuanto llegues el domingo, ve directo a la taquilla del puerto y compra el billete del ferry del lunes a Sorrento. Un minuto te ahorra el estrés del día siguiente.'
+  },
+  {
+    id:'ravello', name:'Ravello', day:'Dom 26 · atardecer',
+    img:'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=80',
+    desc:'Villa Cimbrone. Vistas de los dos golfos al atardecer.',
+    pills:['Dom ~18:30h','Taxi desde Amalfi'],
+    info:[
+      {label:'Qué hacer',val:'Villa Cimbrone · Terrazza dell\'Infinito · Villa Rufolo'},
+      {label:'Cuánto tiempo',val:'~2 horas · Llega a las 18:30 para el atardecer'},
+      {label:'Qué cuesta',val:'Taxi Amalfi→Ravello ~20€ · Entrada Villa Cimbrone ~7€'},
+      {label:'No te pierdas',val:'La Terrazza dell\'Infinito con luz dorada. Lleva la cámara.'}
+    ],
+    tip:'Ravello de día está lleno de grupos organizados. Al atardecer es tuyo. El último taxi baja fácil, o puedes bajar andando en 45 min por el camino de los Limones.'
+  },
+  {
+    id:'atrani', name:'Atrani', day:'Lun 27 · 09:00h',
+    img:'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=800&q=80',
+    desc:'El pueblo más pequeño de Italia. A 5 min de Amalfi en vespa.',
+    pills:['Lun 09:00h','5 min desde Amalfi'],
+    info:[
+      {label:'Qué hacer',val:'Plaza medieval · Iglesia de San Salvatore · Café en la terraza'},
+      {label:'Cuánto tiempo',val:'~45 min · Es la primera parada del día'},
+      {label:'Qué cuesta',val:'Gratis · Solo el café (~2€)'},
+      {label:'No te pierdas',val:'La plaza vacía a las 9h. Desayunad aquí antes de seguir hacia el Fiordo.'}
+    ],
+    tip:'Aparca la vespa en la entrada del pueblo. La plaza está literalmente a 50 metros. Es pequeño pero tiene una autenticidad que Amalfi ya no tiene.'
+  },
+  {
+    id:'fiordo', name:'Fiordo di Furore', day:'Lun 27 · 10:00h',
+    img:'https://images.unsplash.com/photo-1529332138680-83c83e0e4cf8?w=800&q=80',
+    desc:'El fiordo del puente. Bajáis a la cala y os metéis al agua.',
+    pills:['Lun ~10:00h','Mínimo 1h 30m'],
+    info:[
+      {label:'Qué hacer',val:'Bajar las escaleras a la cala · Bañarse · Foto desde el puente'},
+      {label:'Cuánto tiempo',val:'Mínimo 1h 30m. No lo escatimes.'},
+      {label:'Qué cuesta',val:'Gratis · Lleva agua y algo de comer'},
+      {label:'No te pierdas',val:'Bajar hasta el fondo de la cala y bañarte mirando el arco de roca. Es el momento más irrepetible del viaje.'}
+    ],
+    tip:'Lleva calzado de agua, la roca resbala. Aparca la vespa en el puente (hay espacio). Las escaleras son empinadas pero cortas. Vale cada paso.'
+  },
+  {
+    id:'positano', name:'Positano', day:'Lun 27 · 12:30h',
+    img:'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=800&q=80',
+    desc:'Las casitas de colores sobre el acantilado. La foto icónica.',
+    pills:['Lun ~12:30h','~1h 30m'],
+    info:[
+      {label:'Qué hacer',val:'Mirador de la carretera · Marina Grande · Paseo por el pueblo'},
+      {label:'Cuánto tiempo',val:'~1h 30m · No más, el ferry del lunes no espera'},
+      {label:'Qué cuesta',val:'Restaurante formal: evitarlo. Panini en alimentari: ~5€'},
+      {label:'No te pierdas',val:'Para la vespa en el mirador de la carretera de arriba para la foto. Luego baja andando al pueblo y a la playa.'}
+    ],
+    tip:'No bajes a un restaurante formal. Compra panini en un alimentari local y cómetelos en la arena de Marina Grande mirando las casitas de colores. Es el almuerzo perfecto y ahorras 2 horas y 40€.'
+  },
+  {
+    id:'capri', name:'Capri', day:'Mar 28 · todo el día',
+    img:'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80',
+    desc:'La Gruta Azul y el paseo en barco alrededor de la isla.',
+    pills:['Mar 08:30h','Sorrento 20 min'],
+    info:[
+      {label:'Qué hacer',val:'Gruta Azul · Paseo en barco · Anacapri en teleférico'},
+      {label:'Cuánto tiempo',val:'Día entero · Ferry de vuelta a las 17:00h'},
+      {label:'Qué cuesta',val:'Ferry Sorrento→Capri ~25€/pax · Gruta Azul ~15€ · Barco ~20€'},
+      {label:'No te pierdas',val:'Reservar el bote de la Gruta nada más llegar al puerto. Las plazas se acaban antes de las 11h.'}
+    ],
+    tip:'Llegaréis de los primeros desde Sorrento. Esa es vuestra ventaja. Id directo al puerto y reservad el bote para la Gruta. La mejor luz es entre las 11h y las 14h. Después del mediodía las colas son brutales.'
+  }
+];
+
+const CHECKLIST_GROUPS = [
+  { icon:'🏨', name:'Alojamiento', items:[
+    'Hotel en Amalfi · noche del 26 al 27',
+    'Hotel en Sorrento · noche del 27 al 28',
+    'Hotel en Nápoles · noche del 28 al 29 (cerca aeropuerto)'
+  ]},
+  { icon:'⛴', name:'Ferrys', items:[
+    'Ferry Salerno → Amalfi · domingo ~17:15h',
+    'Ferry Amalfi → Sorrento · lunes ~17:30h (comprar en Amalfi el domingo)',
+    'Ferry Sorrento → Capri · martes 08:30h',
+    'Ferry Capri → Nápoles · martes ~17:00h'
+  ]},
+  { icon:'🎫', name:'Actividades', items:[
+    'Vespa en Amalfi · reservar con antelación',
+    'Tour Gruta Azul Capri · reservar online',
+    'Taxi Amalfi → Ravello · domingo tarde'
+  ]},
+  { icon:'🧳', name:'Equipaje', items:[
+    'Solo mochilas (sin maletas de ruedas)',
+    'Calzado de agua para el Fiordo di Furore',
+    'Protección solar (julio en la costa)',
+    'Ropa de baño y toalla compacta'
+  ]},
+  { icon:'📱', name:'App y documentación', items:[
+    'Esta app instalada y funcionando offline',
+    'Pasaportes / DNIs en regla',
+    'Tarjeta de crédito sin comisiones en el extranjero',
+    'Seguro de viaje activo'
+  ]}
+];
+
+const BUDGET_SECTIONS = [
+  { name:'Transporte', items:[
+    { label:'Tren Nápoles → Salerno (x2)', est:'~6€', key:'tren_salerno' },
+    { label:'Ferry Salerno → Amalfi (x2)', est:'~30€', key:'ferry_sal_amal' },
+    { label:'Ferry Amalfi → Sorrento (x2)', est:'~50€', key:'ferry_amal_sor' },
+    { label:'Ferry Sorrento → Capri (x2)', est:'~50€', key:'ferry_sor_capri' },
+    { label:'Ferry Capri → Nápoles (x2)', est:'~60€', key:'ferry_capri_nap' },
+    { label:'Taxi Amalfi → Ravello ida y vuelta', est:'~40€', key:'taxi_ravello' },
+  ]},
+  { name:'Actividades', items:[
+    { label:'Vespa · día completo', est:'~50€', key:'vespa' },
+    { label:'Gruta Azul + bote Capri', est:'~70€', key:'gruta' },
+    { label:'Entradas Villa Cimbrone Ravello', est:'~14€', key:'cimbrone' },
+  ]},
+  { name:'Alojamiento', items:[
+    { label:'Hotel Amalfi · 1 noche (2 pax)', est:'~180€', key:'hotel_amalfi' },
+    { label:'Hotel Sorrento · 1 noche (2 pax)', est:'~140€', key:'hotel_sorrento' },
+    { label:'Hotel Nápoles aeropuerto · 1 noche (2 pax)', est:'~80€', key:'hotel_nap' },
+  ]},
+  { name:'Comidas y varios', items:[
+    { label:'Comidas estimadas (3 días x 2 pax)', est:'~200€', key:'comidas' },
+    { label:'Varios / imprevistos', est:'~60€', key:'varios' },
+  ]}
+];
+
+// ── STATE ─────────────────────────────────────────────────────
+let checklistState = JSON.parse(localStorage.getItem('cl_state') || '{}');
+let budgetState = JSON.parse(localStorage.getItem('budget_state') || '{}');
+let photosState = JSON.parse(localStorage.getItem('photos_state') || '{}');
+let currentParada = null;
+
+// ── NAV ───────────────────────────────────────────────────────
+function showScreen(name, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ── PARADAS ───────────────────────────────────────────────────
+function buildParadas() {
+  const grid = document.getElementById('paradas-grid');
+  grid.innerHTML = PARADAS.map(p => {
+    const photos = photosState[p.id] || [];
+    const count = photos.filter(Boolean).length;
+    return `
+    <div class="parada-card" onclick="openDetail('${p.id}')">
+      <div class="parada-thumb">
+        <img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.style.display='none'">
+        <div class="parada-thumb-label">${p.name}</div>
+      </div>
+      <div class="parada-meta">
+        <div class="parada-tag">${p.day}</div>
+        <div class="parada-desc">${p.desc}</div>
+        <div class="parada-photos-count">${count > 0 ? `📷 ${count} foto${count>1?'s':''} añadida${count>1?'s':''}` : '📷 Sin fotos aún · toca para añadir'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openDetail(id) {
+  currentParada = PARADAS.find(p => p.id === id);
+  const p = currentParada;
+  document.getElementById('detail-hero-img').src = p.img;
+  document.getElementById('detail-title').textContent = p.name;
+  document.getElementById('detail-pills').innerHTML = p.pills.map(pill =>
+    `<span class="d-pill">${pill}</span>`).join('');
+  document.getElementById('detail-info').innerHTML = p.info.map(i =>
+    `<div class="info-card"><div class="info-card-label">${i.label}</div><div class="info-card-val">${i.val}</div></div>`
+  ).join('');
+  document.getElementById('detail-tip').innerHTML =
+    `<span style="font-size:16px;flex-shrink:0">💡</span><div class="pro-tip-text"><strong style="color:var(--green);font-weight:500">Consejo pro: </strong>${p.tip}</div>`;
+  buildGallery(id);
+  document.getElementById('detail-screen').classList.add('open');
+  window.scrollTo(0,0);
+}
+
+function closeDetail() {
+  document.getElementById('detail-screen').classList.remove('open');
+  buildParadas();
+}
+
+function buildGallery(paradaId) {
+  const grid = document.getElementById('detail-gallery');
+  const photos = photosState[paradaId] || Array(6).fill(null);
+  while (photos.length < 6) photos.push(null);
+  grid.innerHTML = photos.slice(0,6).map((photo, i) => {
+    if (photo) {
+      return `<div class="photo-slot" onclick="deletePhoto('${paradaId}',${i})">
+        <img src="${photo}" alt="Foto ${i+1}">
+        <button class="photo-delete">×</button>
+      </div>`;
+    } else {
+      return `<div class="photo-slot empty" onclick="triggerPhotoUpload('${paradaId}',${i})">
+        <span class="photo-plus">+</span>
+        <span class="photo-slot-label">Añadir foto</span>
+      </div>`;
+    }
+  }).join('');
+}
+
+function triggerPhotoUpload(paradaId, slotIndex) {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      if (!photosState[paradaId]) photosState[paradaId] = Array(6).fill(null);
+      photosState[paradaId][slotIndex] = ev.target.result;
+      try { localStorage.setItem('photos_state', JSON.stringify(photosState)); } catch(e) {}
+      buildGallery(paradaId);
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+function deletePhoto(paradaId, slotIndex) {
+  if (!confirm('¿Eliminar esta foto?')) return;
+  if (photosState[paradaId]) {
+    photosState[paradaId][slotIndex] = null;
+    try { localStorage.setItem('photos_state', JSON.stringify(photosState)); } catch(e) {}
+    buildGallery(paradaId);
+  }
+}
+
+// ── CHECKLIST ─────────────────────────────────────────────────
+function buildChecklist() {
+  const container = document.getElementById('checklist-groups');
+  let allItems = 0; let doneItems = 0;
+  container.innerHTML = CHECKLIST_GROUPS.map((group, gi) => {
+    const items = group.items.map((item, ii) => {
+      const key = `${gi}_${ii}`;
+      const done = !!checklistState[key];
+      allItems++; if (done) doneItems++;
+      return `<div class="cl-item ${done?'done':''}" onclick="toggleCheck('${key}',this)">
+        <div class="cl-check"><div class="cl-check-inner"></div></div>
+        <span class="cl-text">${item}</span>
+      </div>`;
+    }).join('');
+    return `<div class="cl-group">
+      <div class="cl-group-head"><span class="cl-group-ico">${group.icon}</span>${group.name}</div>
+      ${items}
+    </div>`;
+  }).join('');
+  updateProgress(doneItems, allItems);
+}
+
+function toggleCheck(key, el) {
+  checklistState[key] = !checklistState[key];
+  try { localStorage.setItem('cl_state', JSON.stringify(checklistState)); } catch(e) {}
+  el.classList.toggle('done');
+  let done = 0; let total = 0;
+  document.querySelectorAll('.cl-item').forEach(i => { total++; if(i.classList.contains('done')) done++; });
+  updateProgress(done, total);
+}
+
+function updateProgress(done, total) {
+  document.getElementById('progress-text').textContent = `${done} / ${total}`;
+  document.getElementById('progress-fill').style.width = total > 0 ? `${Math.round(done/total*100)}%` : '0%';
+}
+
+// ── BUDGET ────────────────────────────────────────────────────
+function buildBudget() {
+  const container = document.getElementById('budget-sections');
+  container.innerHTML = BUDGET_SECTIONS.map(section => {
+    const items = section.items.map(item => {
+      const val = budgetState[item.key] || '';
+      return `<div class="budget-item">
+        <span class="budget-item-label">${item.label}</span>
+        <span class="budget-item-est">${item.est}</span>
+        <input class="budget-input" type="number" min="0" placeholder="0" value="${val}"
+          onchange="updateBudget('${item.key}',this.value)" oninput="updateBudget('${item.key}',this.value)">
+      </div>`;
+    }).join('');
+    return `<div class="budget-section">
+      <div class="budget-section-head">${section.name}</div>
+      <div class="budget-items">${items}</div>
+    </div>`;
+  }).join('');
+  recalcTotal();
+}
+
+function updateBudget(key, val) {
+  budgetState[key] = parseFloat(val) || 0;
+  try { localStorage.setItem('budget_state', JSON.stringify(budgetState)); } catch(e) {}
+  recalcTotal();
+}
+
+function recalcTotal() {
+  const total = Object.values(budgetState).reduce((a,b) => a + (parseFloat(b)||0), 0);
+  document.getElementById('budget-total').textContent = Math.round(total) + ' €';
+  document.getElementById('budget-pp').textContent = Math.round(total/2) + ' € por persona';
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+buildParadas();
+buildChecklist();
+buildBudget();
+</script>
+</body>
+</html>
